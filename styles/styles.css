@@ -1,0 +1,123 @@
+html {
+    background-color: #f2eff6;
+}
+
+body {
+    background-color: #f2eff6;
+}
+
+.card {
+    background-color: #451d7d;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+
+#logo {
+    display: block;
+    margin: 0 auto;
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+}
+
+
+.crypto-card {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #f2eff6;
+    border-radius: 5px;
+}
+
+.crypto-card img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.crypto-card button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    margin-right: 5px;
+    background-color: white;
+    color: black;
+}
+
+.g-sidenav {
+    background-color: #f2eff6;
+
+}
+
+.crypto-card button .logo {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+}
+
+
+#contenido-bitcoin {
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#titulo-bitcoin {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.descripcion,
+.bitcoin-address,
+.precio,
+.moneda-local,
+.btc-price,
+.customer-id {
+    margin: 5px 0;
+}
+
+#regresar {
+    background-color: #451d7d;
+    color: white;
+   
+}
+
+#regresar:hover {
+    background-color: #ca0d9f;
+}
+
+#contenido-bitcoin .bitcoin-address, #contenido-bitcoin .btc-price {
+    text-align: center;
+}
+
+currency-buttons {
+    display: flex;
+}
+
+.currency-button {
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+
+.currency-button.selected {
+    background-color: green;
+    color: white;
+
+
+}
