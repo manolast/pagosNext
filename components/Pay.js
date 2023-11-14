@@ -1,4 +1,4 @@
-import React, { useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import { parseEther } from 'viem'
@@ -20,10 +20,59 @@ import {
 
 
 
-function Payment({ infoBackend, selectedCryptoConfig, selectedCrypto, updateSelectedCrypto, updateSelectedCryptoConfig }) {
+function Payment({ infoBackend, selectedCryptoConfig, selectedCrypto, updateSelectedCrypto, updateSelectedCryptoConfig, new_charge }) {
     const ticker = selectedCrypto;
-    const amount = infoBackend[ticker].amount;
-    const address = infoBackend[ticker].address;
+
+    let amount;
+    let address = new_charge.ethereum_address || '0x0'
+
+    switch (selectedCryptoConfig.name) {
+        case 'Bitcoin':
+            address = new_charge.bitcoin_address;
+            amount = new_charge.btc_price;
+            break;
+        case 'Bitcoin Cash':
+            address = new_charge.bitcoincash_address;
+            amount = new_charge.bch_price;
+            break;
+        case 'Litecoin':
+            address = new_charge.litecoin_address;
+            amount = new_charge.ltc_price;
+            break;
+        case 'Dogecoin':
+            address = new_charge.dogecoin_address;
+            amount = new_charge.dogecoin_price;
+            break;
+        case 'USDCoin':
+            amount = new_charge.usdc_price;
+            break;
+        case 'Tether':
+            amount = new_charge.usdt_price;
+            break;
+        case 'DAI':
+            amount = new_charge.dai_price;
+            break;
+        case 'SHIBA INU':
+            amount = new_charge.shib_price;
+            break;
+        case 'APECOIN':
+            amount = new_charge.ape_price;
+            break;
+        case 'USDC (Polygon)':
+            amount = new_charge.pusdc_price;
+            break;
+        case 'Ethereum':
+            amount = new_charge.eth_price;
+            break;
+        case 'Matic':
+            amount = new_charge.pmatic_price;
+            break;
+        default:
+            address = new_charge.ethereum_address;
+            amount = 1000000000000000;
+            break;
+    }
+
 
     const resetSelection = () => {
         updateSelectedCrypto(null);
@@ -112,19 +161,29 @@ function Payment({ infoBackend, selectedCryptoConfig, selectedCrypto, updateSele
 
 
     return (
-        <div>
-            <button onClick={resetSelection}>Elegir otra crypto</button>
-            <h2>Pago con {selectedCryptoConfig.name}</h2>
-            <p>Dirección: {address}</p>
-            <button onClick={handleCopyAddress}>Copiar dirección</button>
+        <div id='elementos-dinamicos'>
+            <p className='descripcion'>{new_charge.descripcion || "Tu pago con " + selectedCryptoConfig.name}</p>
+            <img src={'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + address}></img>
+            <p>Depositá las criptomonedas desde tu wallet de preferencia</p>
+            {/* <h2>Pago con {selectedCryptoConfig.name}</h2> */}
+            <p>Address: <span className='copyable' style={{
+                color: '#ca0d9f',
+                cursor: 'pointer'
+            }}>{address}</span></p>
+            {/* <button onClick={handleCopyAddress}>Copiar dirección</button> */}
 
-            <p>Monto: {amount} {ticker}</p>
-            <button onClick={handleCopyAmount}>Copiar cantidad</button>
+            <p>Importe: <span className='copyable' style={{
+                color: '#ca0d9f',
+                cursor: 'pointer'
+            }}>{amount}</span> {ticker}</p>
+            {/* <button onClick={handleCopyAmount}>Copiar cantidad</button> */}
+
 
             {(selectedCryptoConfig.tipo === 'native' || selectedCryptoConfig.tipo === 'erc') &&
                 <>
-                    <ConnectButton />
-                    {connectedChain && <div>Connected to {connectedChain.name}</div>}
+                    {!connectedChain && <p>O conecta tu wallet para pagar</p>}
+                    <ConnectButton label='Conectá tu Wallet' />
+                    {connectedChain && <div>Estas conectado a {connectedChain.name}</div>}
                     {connectedChain && selectedCryptoConfig.chainName !== connectedChain.name && (
                         <div>
                             <p>Debes conectarte a la red de {selectedCryptoConfig.chainName} para realizar este pago</p>
@@ -135,6 +194,8 @@ function Payment({ infoBackend, selectedCryptoConfig, selectedCrypto, updateSele
                                             disabled={!switchNetwork}
                                             key={x.id}
                                             onClick={() => switchNetwork?.(x.id)}
+                                            className='btn btn-primary'
+                                            type='button'
                                         >
                                             Clickea aca para cambiar
                                             {isLoading && pendingChainId === x.id && ' (switching)'}
@@ -150,9 +211,9 @@ function Payment({ infoBackend, selectedCryptoConfig, selectedCrypto, updateSele
             {selectedCryptoConfig.tipo === 'native' &&
                 <>
                     <div>
-                        {sendEthError && <p style={{ color: 'red' }}>{sendEthError.message}</p>}
+                        {sendEthError && <p style={{ color: 'red' }}>Ocurrio un error al enviar la transacción. Verificá tener fondos suficientes en tu wallet.</p>}
 
-                        <button disabled={!connectedChain || connectedChain.name !== selectedCryptoConfig.chainName} onClick={handleSendTransaction}>Enviar</button>
+                        {(connectedChain && connectedChain.name == selectedCryptoConfig.chainName) && <button onClick={handleSendTransaction} className='my-3'>Enviar transacción</button>}
                     </div>
                 </>
             }
@@ -160,13 +221,14 @@ function Payment({ infoBackend, selectedCryptoConfig, selectedCrypto, updateSele
                 selectedCryptoConfig.tipo === 'erc' &&
                 <>
                     <div>
-                        {transactionError && <p style={{ color: 'red' }}>{transactionError.message}</p>}
+                        {transactionError && <p style={{ color: 'red' }}>Ocurrio un error al enviar la transacción. Verificá tener fondos suficientes en tu wallet.</p>}
 
-                        <button disabled={!connectedChain || connectedChain.name !== selectedCryptoConfig.chainName} onClick={handleWrite}>Enviar</button>
+                        {(connectedChain && connectedChain.name == selectedCryptoConfig.chainName) && <button onClick={handleWrite} className='my-2'>Enviar transacción</button>}
                     </div>
                 </>
             }
 
+            <button onClick={resetSelection} id='regresar' className='mt-2'>Elegir otra crypto</button>
 
         </div>
 
